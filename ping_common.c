@@ -225,7 +225,7 @@ static void fill(char *patp)
 	    &pat[13], &pat[14], &pat[15]);
 
 	if (ii > 0) {
-		for (kk = 0; kk <= maxpacket - (8 + ii); kk += ii)
+		for (kk = 0; kk <= *maxpacket - (8 + ii); kk += ii)
 			for (jj = 0; jj < ii; ++jj)
 				bp[jj + kk] = pat[jj];
 	}
@@ -346,7 +346,7 @@ void common_options(int ch)
 			fprintf(stderr, "ping: illegal negative packet size %d.\n", datalen);
 			exit(2);
 		}
-		if (datalen > maxpacket - 8) {
+		if (datalen > *maxpacket - 8) {
 			fprintf(stderr, "ping: packet size too large: %d\n",
 				datalen);
 			exit(2);
@@ -383,6 +383,11 @@ void common_options(int ch)
 	case 'V':
 		printf("ping utility, iputils-%s\n", SNAPSHOT);
 		exit(0);
+	case '4':
+		/* FALLTHROUGH */
+	case '6':
+		/* TODO Temporary. Do nothing. */
+		break;
 	default:
 		abort();
 	}

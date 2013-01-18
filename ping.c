@@ -85,7 +85,7 @@ int optlen = 0;
 int settos = 0;			/* Set TOS, Precendence or other QOS options */
 int icmp_sock;			/* socket file descriptor */
 u_char outpack[0x10000];
-int maxpacket = sizeof(outpack);
+int maxpacket4 = sizeof(outpack);
 
 static int broadcast_pings = 0;
 
@@ -110,7 +110,7 @@ int pmtudisc = -1;
 
 
 int
-main(int argc, char **argv)
+ping4(int argc, char **argv)
 {
 	struct hostent *hp;
 	int ch, hold, packlen;
@@ -123,6 +123,7 @@ main(int argc, char **argv)
 	char hnamebuf[MAX_HOSTNAMELEN];
 #endif
 	char rspace[3 + 4 * NROUTES + 1];	/* record route space */
+	int rc;
 
 	limit_capabilities();
 
@@ -257,8 +258,6 @@ main(int argc, char **argv)
 		} else {
 			char *idn;
 #ifdef USE_IDN
-			int rc;
-
 			if (hnamebuf) {
 				free(hnamebuf);
 				hnamebuf = NULL;
@@ -312,7 +311,6 @@ main(int argc, char **argv)
 		}
 		if (device) {
 			struct ifreq ifr;
-			int rc;
 
 			memset(&ifr, 0, sizeof(ifr));
 			strncpy(ifr.ifr_name, device, IFNAMSIZ-1);
@@ -584,7 +582,7 @@ main(int argc, char **argv)
 }
 
 
-int receive_error_msg()
+int receive_error_msg4()
 {
 	int res;
 	char cbuf[512];
@@ -685,7 +683,7 @@ out:
  * of the data portion are used to hold a UNIX "timeval" struct in VAX
  * byte-order, to compute the round-trip time.
  */
-int send_probe()
+int send_probe4()
 {
 	struct icmphdr *icp;
 	int cc;
@@ -750,7 +748,7 @@ void pr_echo_reply(__u8 *_icp, int len)
 }
 
 int
-parse_reply(struct msghdr *msg, int cc, void *addr, struct timeval *tv)
+parse_reply4(struct msghdr *msg, int cc, void *addr, struct timeval *tv)
 {
 	struct sockaddr_in *from = addr;
 	__u8 *buf = msg->msg_iov->iov_base;
@@ -1314,7 +1312,7 @@ int parsetos(char *str)
 
 #include <linux/filter.h>
 
-void install_filter(void)
+void install_filter4(void)
 {
 	static int once;
 	static struct sock_filter insns[] = {

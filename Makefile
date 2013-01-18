@@ -106,9 +106,10 @@ endif
 endif
 
 # -------------------------------------
-IPV4_TARGETS=tracepath ping clockdiff rdisc arping tftpd rarpd
-IPV6_TARGETS=tracepath6 traceroute6 ping6
-TARGETS=$(IPV4_TARGETS) $(IPV6_TARGETS)
+PING_TARGET=pingu
+IPV4_TARGETS=tracepath clockdiff rdisc arping tftpd rarpd
+IPV6_TARGETS=tracepath6 traceroute6
+TARGETS=$(IPV4_TARGETS) $(IPV6_TARGETS) $(PING_TARGET)
 
 CFLAGS=$(CCOPTOPT) $(CCOPT) $(GLIBCFIX) $(DEFINES)
 LDLIBS=$(LDLIB) $(ADDLIB)
@@ -149,13 +150,17 @@ LIB_clockdiff = $(LIB_CAP)
 DEF_ping_common = $(DEF_CAP) $(DEF_IDN)
 DEF_ping  = $(DEF_CAP) $(DEF_IDN) $(DEF_WITHOUT_IFADDRS)
 LIB_ping  = $(LIB_CAP) $(LIB_IDN)
-DEF_ping6 = $(DEF_CAP) $(DEF_IDN) $(DEF_WITHOUT_IFADDRS) $(DEF_ENABLE_PING6_RTHDR) $(DEF_CRYPTO)
+DEF_ping6 = $(DEF_CAP) $(DEF_IDN) $(DEF_WITHOUT_IFADDRS) $(DEF_ENABLE_PING6_RTHDR)
 LIB_ping6 = $(LIB_CAP) $(LIB_IDN) $(LIB_RESOLV) $(LIB_CRYPTO)
+DEF_pingu = $(DEF_ping6)
+LIB_pingu = $(LIB_ping6)
 
 ping: ping_common.o
 ping6: ping_common.o
 ping.o ping_common.o: ping_common.h
 ping6.o: ping_common.h in6_flowlabel.h
+pingu: pingu.o ping.o ping6.o ping_common.o
+pingu.o: ping.o ping6.o ping_common.o
 
 # rarpd
 DEF_rarpd =

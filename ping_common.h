@@ -119,7 +119,9 @@ static inline bitmap_t rcvd_test(__u16 seq)
 }
 
 extern u_char outpack[];
-extern int maxpacket;
+extern int *maxpacket;
+extern int maxpacket4;
+extern int maxpacket6;
 
 extern int datalen;
 extern char *hostname;
@@ -170,9 +172,10 @@ case 'f': case 'i': case 'w': case 'l': \
 case 'S': case 'n': case 'p': case 'q': \
 case 'r': case 's': case 'v': case 'L': \
 case 't': case 'A': case 'W': case 'B': case 'm': \
-case 'D': case 'O':
+case 'D': case 'O': \
+case '4': case '6':
 
-#define COMMON_OPTSTR "h?VQ:I:M:aUc:dfi:w:l:S:np:qrs:vLt:AW:Bm:DO"
+#define COMMON_OPTSTR "h?VQ:I:M:aUc:dfi:w:l:S:np:qrs:vLt:AW:Bm:DO46"
 
 /*
  * Write to stdout
@@ -269,10 +272,18 @@ static inline int disable_capability_admin(void)	{ return modify_capability(0); 
 #endif
 extern void drop_capabilities(void);
 
-extern int send_probe(void);
-extern int receive_error_msg(void);
-extern int parse_reply(struct msghdr *msg, int len, void *addr, struct timeval *);
-extern void install_filter(void);
+extern int (*send_probe)(void);
+extern int send_probe4(void);
+extern int send_probe6(void);
+extern int (*receive_error_msg)(void);
+extern int receive_error_msg4(void);
+extern int receive_error_msg6(void);
+extern int (*parse_reply)(struct msghdr *msg, int len, void *addr, struct timeval *);
+extern int parse_reply4(struct msghdr *msg, int len, void *addr, struct timeval *);
+extern int parse_reply6(struct msghdr *msg, int len, void *addr, struct timeval *);
+extern void (*install_filter)(void);
+extern void install_filter4(void);
+extern void install_filter6(void);
 
 extern int pinger(void);
 extern void sock_setbufs(int icmp_sock, int alloc);
@@ -286,3 +297,7 @@ extern int gather_statistics(__u8 *ptr, int icmplen,
 			     int csfailed, struct timeval *tv, char *from,
 			     void (*pr_reply)(__u8 *ptr, int cc));
 extern void print_timestamp(void);
+
+extern int ping4(int argc, char **argv);
+extern int ping6(int argc, char **argv);
+extern int use_ipv6;

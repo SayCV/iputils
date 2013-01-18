@@ -143,7 +143,7 @@ struct cmsghdr *srcrt;
 
 struct sockaddr_in6 whereto;	/* who to ping */
 u_char outpack[MAXPACKET];
-int maxpacket = sizeof(outpack);
+int maxpacket6 = sizeof(outpack);
 
 static unsigned char cmsgbuf[4096];
 static int cmsglen = 0;
@@ -155,7 +155,7 @@ static void usage(void) __attribute((noreturn));
 
 struct sockaddr_in6 source;
 char *device;
-int pmtudisc=-1;
+int pmtudisc6=-1;
 
 static int icmp_sock;
 
@@ -685,7 +685,7 @@ static int hextoui(const char *str)
 	return val;
 }
 
-int main(int argc, char *argv[])
+int ping6(int argc, char *argv[])
 {
 	int ch, hold, packlen;
 	u_char *packet;
@@ -766,11 +766,11 @@ int main(int argc, char *argv[])
 			break;
 		case 'M':
 			if (strcmp(optarg, "do") == 0)
-				pmtudisc = IPV6_PMTUDISC_DO;
+				pmtudisc6 = IPV6_PMTUDISC_DO;
 			else if (strcmp(optarg, "dont") == 0)
-				pmtudisc = IPV6_PMTUDISC_DONT;
+				pmtudisc6 = IPV6_PMTUDISC_DONT;
 			else if (strcmp(optarg, "want") == 0)
-				pmtudisc = IPV6_PMTUDISC_WANT;
+				pmtudisc6 = IPV6_PMTUDISC_WANT;
 			else {
 				fprintf(stderr, "ping: wrong value for -M: do, dont, want are valid ones.\n");
 				exit(2);
@@ -1040,17 +1040,17 @@ int main(int argc, char *argv[])
 				fprintf(stderr, "ping: multicast ping with too short interval.\n");
 				exit(2);
 			}
-			if (pmtudisc >= 0 && pmtudisc != IPV6_PMTUDISC_DO) {
+			if (pmtudisc6 >= 0 && pmtudisc6 != IPV6_PMTUDISC_DO) {
 				fprintf(stderr, "ping: multicast ping does not fragment.\n");
 				exit(2);
 			}
 		}
-		if (pmtudisc < 0)
-			pmtudisc = IPV6_PMTUDISC_DO;
+		if (pmtudisc6 < 0)
+			pmtudisc6 = IPV6_PMTUDISC_DO;
 	}
 
-	if (pmtudisc >= 0) {
-		if (setsockopt(icmp_sock, SOL_IPV6, IPV6_MTU_DISCOVER, &pmtudisc, sizeof(pmtudisc)) == -1) {
+	if (pmtudisc6 >= 0) {
+		if (setsockopt(icmp_sock, SOL_IPV6, IPV6_MTU_DISCOVER, &pmtudisc6, sizeof(pmtudisc6)) == -1) {
 			perror("ping: IPV6_MTU_DISCOVER");
 			exit(2);
 		}
@@ -1243,7 +1243,7 @@ int main(int argc, char *argv[])
 	main_loop(icmp_sock, packet, packlen);
 }
 
-int receive_error_msg()
+int receive_error_msg6()
 {
 	int res;
 	char cbuf[512];
@@ -1376,7 +1376,7 @@ int build_niquery(__u8 *_nih)
 	return cc;
 }
 
-int send_probe(void)
+int send_probe6(void)
 {
 	int len, cc;
 
@@ -1413,7 +1413,7 @@ int send_probe(void)
 	return (cc == len ? 0 : cc);
 }
 
-void pr_echo_reply(__u8 *_icmph, int cc)
+void pr_echo_reply6(__u8 *_icmph, int cc)
 {
 	struct icmp6_hdr *icmph = (struct icmp6_hdr *) _icmph;
 	printf(" icmp_seq=%u", ntohs(icmph->icmp6_seq));
@@ -1562,7 +1562,7 @@ void pr_niquery_reply(__u8 *_nih, int len)
  * program to be run without having intermingled output (or statistics!).
  */
 int
-parse_reply(struct msghdr *msg, int cc, void *addr, struct timeval *tv)
+parse_reply6(struct msghdr *msg, int cc, void *addr, struct timeval *tv)
 {
 	struct sockaddr_in6 *from = addr;
 	__u8 *buf = msg->msg_iov->iov_base;
@@ -1600,7 +1600,7 @@ parse_reply(struct msghdr *msg, int cc, void *addr, struct timeval *tv)
 		if (gather_statistics((__u8*)icmph, sizeof(*icmph), cc,
 				      ntohs(icmph->icmp6_seq),
 				      hops, 0, tv, pr_addr(&from->sin6_addr),
-				      pr_echo_reply))
+				      pr_echo_reply6))
 			return 0;
 	} else if (icmph->icmp6_type == ICMPV6_NI_REPLY) {
 		struct ni_hdr *nih = (struct ni_hdr *)icmph;
@@ -1749,7 +1749,7 @@ int pr_icmph(__u8 type, __u8 code, __u32 info)
 
 #include <linux/filter.h>
 
-void install_filter(void)
+void install_filter6(void)
 {
 	static int once;
 	static struct sock_filter insns[] = {
