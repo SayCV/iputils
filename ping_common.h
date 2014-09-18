@@ -4,8 +4,13 @@
 #include <time.h>
 #include <sys/param.h>
 #include <sys/socket.h>
+#ifdef __CYGWIN__
+#include <cygwin/types.h>
+#include <cygwin/sockios.h>
+#else
 #include <linux/types.h>
 #include <linux/sockios.h>
+#endif
 #include <sys/file.h>
 #include <sys/time.h>
 #include <sys/signal.h>
@@ -19,6 +24,9 @@
 #include <netdb.h>
 #include <setjmp.h>
 
+#ifdef __CYGWIN__
+#undef CAPABILITIES
+#endif
 #ifdef CAPABILITIES
 #include <sys/prctl.h>
 #include <sys/capability.h>
@@ -31,8 +39,13 @@
 
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#ifdef __CYGWIN__
+#include <cygwin/types.h>
+//#include <errqueue.h>
+#else
 #include <linux/types.h>
 #include <linux/errqueue.h>
+#endif
 
 #include "SNAPSHOT.h"
 

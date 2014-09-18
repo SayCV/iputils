@@ -13,8 +13,17 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/socket.h>
+
+#ifdef __CYGWIN__
+#include <ctype.h>
+typedef uint32_t __u32;
+typedef uint16_t __u16;
+typedef unsigned char __u8;
+#else
 #include <linux/types.h>
 #include <linux/errqueue.h>
+#endif
+
 #include <errno.h>
 #include <string.h>
 #include <netdb.h>
